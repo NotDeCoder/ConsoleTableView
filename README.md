@@ -7,16 +7,30 @@ Here I created a table, assigned titles to it, added elements and displayed it i
 
 ````csharp
 TableOfData showTable = new TableOfData("Name", "Age", "Height", "Weight");
-
+            
 showTable.AddRow("Kim Min Yang", "101", "180", "80");
 showTable.AddRow("Dorkiva Albel Rovo De Gusto Bret IV", "9", "95", "40");
-showTable.AddRow("Czech Lorem Ipsun", "30", "165", "58");
+showTable.AddRow("Czech Lorem Ipsum", "30", "165", "58");
 showTable.AddRow("Firr Din Tos", "16", "176", "76");
+            
 showTable.Show();
 ````
 Result of the program:\
 <br/>
-![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184145226-837fd72e-9fe8-4390-8e4a-89e10b8ee94f.png)
+![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184317100-333543de-96d7-4610-b3c1-11113fbd3a86.png)
+
+<br/><br/>
+
+
+### Numeration
+You can turn on the numbering of elements in the table. The output will create a new column where the row index will be shown
+
+````csharp
+showTable.ShowWithNumeration();
+````
+Result of the program:\
+<br/>
+![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184317413-cb1bde98-4d81-425b-a9f5-ccb2337d5c01.png)
 
 <br/><br/>
 
@@ -25,28 +39,46 @@ You can remove an element (row) from a table
 
 ````csharp
 showTable.DeleteRow(1);
-showTable.Show();
+showTable.ShowWithNumeration();
 ````
 Result of the program:\
 <br/>
-![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184146276-f9c433f5-400e-43b3-b61c-3258b45ccd43.png)
+![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184317843-b56eb5c1-a276-448f-ac74-98eadf86d2e0.png)
 
 <br/><br/>
 
 ### Spaces in cells
-You can also change the number of spaces for cells
+You can change the number of spaces for cells. I also showed here another option for outputting a table to the console
 
 ````csharp
-showTable.DeleteRow(1);
 showTable.SetSpacesOfColumn(5);
-showTable.Show();
+Console.WriteLine(showTable.GetTableAsString());
 ````
 Result of the program:\
 <br/>
-![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184146540-e27636d2-b3ad-4f73-b7cf-e2fcd9da01ed.png)
+![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184318023-b7b9b98a-1c4f-405c-bc96-3b7862fdeff8.png)
 ___
+### Total output
+Here I combined all of the above to show the total output to the console
+```` csharp
+TableOfData showTable = new TableOfData("Name", "Age", "Height", "Weight");
+            
+showTable.AddRow("Kim Min Yang", "101", "180", "80");
+showTable.AddRow("Dorkiva Albel Rovo De Gusto Bret IV", "9", "95", "40");
+showTable.AddRow("Czech Lorem Ipsum", "30", "165", "58");
+showTable.AddRow("Firr Din Tos", "16", "176", "76");
+
+showTable.Show();
+showTable.ShowWithNumeration();
+
+showTable.DeleteRow(1);
+showTable.ShowWithNumeration();
+
+showTable.SetSpacesOfColumn(5);
+Console.WriteLine(showTable.GetTableAsString());
+````
 Total result of the program:\
 <br/>
-![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184152052-15f901e4-496f-4338-98e3-2aaaac9382dc.png)
+![Oops.. something wrong. I can't show you an image of the results](https://user-images.githubusercontent.com/94294950/184318891-9cd0913e-e952-4123-9851-4971c1c2cdfc.png)
 <br/><br/>
 For now, that's all. I will try to refine this project in the near future. Have a good use

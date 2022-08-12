@@ -36,13 +36,13 @@ namespace TableOfInfo
         #endregion
 
         #region Private Methods
-        private int GetLargestWidthsFromColumn(int column)
+        private int GetLargestWidthsFromColumn(string[] newTitles, List<List<string>> newElements, int column)
         {
-            int maxLength = titles[column].Length;
-            for (int i = 0; i < elements.Count; i++)
+            int maxLength = newTitles[column].Length;
+            for (int i = 0; i < newElements.Count; i++)
             {
-                if (elements[i][column].ToString().Length > maxLength)
-                    maxLength = elements[i][column].ToString().Length;
+                if (newElements[i][column].ToString().Length > maxLength)
+                    maxLength = newElements[i][column].ToString().Length;
             }
             return maxLength;
         }
@@ -53,7 +53,7 @@ namespace TableOfInfo
         {
             if (constrTitles.Length == 0)
                 throw new Exception("There must be at least one title. Add they in constructor");
-            
+
             titles = constrTitles;
             elements = new List<List<string>>();
             spaceOfColumn = 2;
@@ -63,105 +63,132 @@ namespace TableOfInfo
         {
             if (newRow.Length != titles.Length)
                 throw new Exception($"The number of elements in a new row ({newRow.Length}) does not match the number of columns ({titles.Length})");
+
             elements.Add(newRow.Select(x => x.ToString()).ToList());
         }
-        
+
         public void DeleteRow(int row)
         {
-            if (row >= elements.Count || row < 0)
+            if (row > elements.Count || row < 0)
                 throw new Exception($"Row {row} does not exist");
-            
-            elements.RemoveAt(row);
 
+            elements.RemoveAt(row);
         }
-        
+
         public void SetSpacesOfColumn(int space)
         {
             if (space < 0)
                 throw new Exception("The space of column must be positive");
+
             spaceOfColumn = space;
         }
 
         public void Show()
         {
+            Console.WriteLine(GetTableAsString());
+        }
+        
+        public void ShowWithNumeration()
+        {
+            Console.WriteLine(GetTableAsString(true));
+        }
+
+        public string GetTableAsString(bool doWeDrawNumbers = false)
+        {
+            string resultString = "";
+
+            string[] newTitles;
+            List<List<string>> newElements;
+            if (doWeDrawNumbers) //Add new title, add number to every element
+            {
+                newTitles = titles.Prepend("Number").ToArray();
+                newElements = elements.Select(x => x.Prepend(elements.IndexOf(x).ToString()).ToList()).ToList();
+            }
+            else
+            {
+                newTitles = titles;
+                newElements = elements;
+            }
+
             //Array with largest widths from each column
-            int[] columnsWidth = new int[titles.Length];
+            int[] columnsWidth = new int[newTitles.Length];
             for (int i = 0; i < columnsWidth.Length; i++)
-                columnsWidth[i] = 2 * spaceOfColumn + GetLargestWidthsFromColumn(i);
+                columnsWidth[i] = 2 * spaceOfColumn + GetLargestWidthsFromColumn(newTitles, newElements, i);
 
 
             //Print upper lines of table`s titles
-            for (int i = 0; i < titles.Length; i++)
+            for (int i = 0; i < newTitles.Length; i++)
             {
                 if (i == 0)
-                    Console.Write(TOP_LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i])); // ┌────
-                else if (i == titles.Length - 1)
-                    Console.Write(TOP_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]) + TOP_RIGHT_JOINT + '\n'); // ┬────┐
+                    resultString += TOP_LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]); // ┌────
+                else if (i == newTitles.Length - 1)
+                    resultString += TOP_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]) + TOP_RIGHT_JOINT + '\n'; // ┬────┐
                 else
-                    Console.Write(TOP_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i])); // ┬────
+                    resultString += TOP_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]); // ┬────
             }
 
             //print titles
-            for (int i = 0; i < titles.Length; i++)
+            for (int i = 0; i < newTitles.Length; i++)
             {
-                string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[i] - titles[i].Length) / 2);
-                string rightPadding = new string(PADDING, columnsWidth[i] - titles[i].Length - (columnsWidth[i] - titles[i].Length) / 2);
-                if (i == titles.Length - 1)
+                string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[i] - newTitles[i].Length) / 2);
+                string rightPadding = new string(PADDING, columnsWidth[i] - newTitles[i].Length - (columnsWidth[i] - newTitles[i].Length) / 2);
+                if (i == newTitles.Length - 1)
                     rightPadding = rightPadding + VERTICAL_LINE + '\n';
 
-                Console.Write(leftPadding + titles[i] + rightPadding); // "│  NotLastTitle  ",    "│  LastTitle  │"
+                resultString += leftPadding + newTitles[i] + rightPadding; // "│  NotLastTitle  ",    "│  LastTitle  │"
             }
 
             //Print lower lines of table`s titles
-            for (int i = 0; i < titles.Length; i++)
+            for (int i = 0; i < newTitles.Length; i++)
             {
                 if (i == 0)
-                    Console.Write(LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i])); // ├────
-                else if (i == titles.Length - 1)
-                    Console.Write(JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]) + RIGHT_JOINT + '\n'); // ┼────┤
+                    resultString += LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]); // ├────
+                else if (i == newTitles.Length - 1)
+                    resultString += JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]) + RIGHT_JOINT + '\n'; // ┼────┤
                 else
-                    Console.Write(JOINT + new string(HORIZONTAL_LINE, columnsWidth[i])); // ┼────
+                    resultString += JOINT + new string(HORIZONTAL_LINE, columnsWidth[i]); // ┼────
             }
 
             //Print elements of table
-            for (int i = 0; i < elements.Count; i++)
+            for (int i = 0; i < newElements.Count; i++)
             {
-                for (int j = 0; j < elements[i].Count; j++)
+                for (int j = 0; j < newElements[i].Count; j++)
                 {
-                    string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[j] - elements[i][j].Length) / 2);
-                    string rightPadding = new string(PADDING, columnsWidth[j] - elements[i][j].Length - ((columnsWidth[j] - elements[i][j].Length) / 2));
-                    if (j == elements[i].Count - 1) //If it`s last cell
+                    string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[j] - newElements[i][j].Length) / 2);
+                    string rightPadding = new string(PADDING, columnsWidth[j] - newElements[i][j].Length - ((columnsWidth[j] - newElements[i][j].Length) / 2));
+                    if (j == newElements[i].Count - 1) //If it`s last cell
                         rightPadding = rightPadding + VERTICAL_LINE + '\n';
-                    Console.Write(leftPadding + elements[i][j] + rightPadding); // "│  NotLastElement  ",    "│  LastElement  │"
+                    resultString += leftPadding + newElements[i][j] + rightPadding; // "│  NotLastElement  ",    "│  LastElement  │"
                 }
-                if (i != elements.Count - 1) //if it`s not last row
+                if (i != newElements.Count - 1) //if it`s not last row
                 {
-                    for (int j = 0; j < titles.Length; j++)
+                    for (int j = 0; j < newTitles.Length; j++)
                     {
                         if (j == 0)
-                            Console.Write(LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j])); // ├────
-                        else if (j == titles.Length - 1)
-                            Console.Write(JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]) + RIGHT_JOINT + '\n'); // ┼────┤
+                            resultString += LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]); // ├────
+                        else if (j == newTitles.Length - 1)
+                            resultString += JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]) + RIGHT_JOINT + '\n'; // ┼────┤
                         else
-                            Console.Write(JOINT + new string(HORIZONTAL_LINE, columnsWidth[j])); // ┼────
+                            resultString += JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]); // ┼────
                     }
                 }
                 else //If it`s last row
                 {
-                    for (int j = 0; j < titles.Length; j++)
+                    for (int j = 0; j < newTitles.Length; j++)
                     {
                         if (j == 0)
-                            Console.Write(BOTTOM_LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j])); // └────
-                        else if (j == titles.Length - 1)
-                            Console.Write(BOTTOM_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]) + BOTTOM_RIGHT_JOINT + '\n'); // ┴────┘
+                            resultString += BOTTOM_LEFT_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]); // └────
+                        else if (j == newTitles.Length - 1)
+                            resultString += BOTTOM_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]) + BOTTOM_RIGHT_JOINT + '\n'; // ┴────┘
                         else
-                            Console.Write(BOTTOM_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j])); // ┴────
+                            resultString += BOTTOM_JOINT + new string(HORIZONTAL_LINE, columnsWidth[j]); // ┴────
                     }
                 }
 
             }
+            return resultString;
         }
-
+        
         #endregion
     }
 }
