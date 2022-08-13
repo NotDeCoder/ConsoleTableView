@@ -67,6 +67,17 @@ namespace TableOfInfo
             elements.Add(newRow.Select(x => x.ToString()).ToList());
         }
 
+        public void InsertRow(int index, params object[] newRow)
+        {
+            if (newRow.Length != titles.Length)
+                throw new Exception($"The number of elements in a new row ({newRow.Length}) does not match the number of columns ({titles.Length})");
+
+            if (index < 0 || index > elements.Count)
+                throw new Exception($"Index ({index}) is out of range");
+
+            elements.Insert(index, newRow.Select(x => x.ToString()).ToList());
+        }
+        
         public void DeleteRow(int row)
         {
             if (row > elements.Count || row < 0)
@@ -75,22 +86,74 @@ namespace TableOfInfo
             elements.RemoveAt(row);
         }
 
+        public void ChangeRow(int row, params object[] newRow)
+        {
+            if (row > elements.Count || row < 0)
+                throw new Exception($"Row {row} does not exist");
+            
+            if (newRow.Length != titles.Length)
+                throw new Exception($"The number of elements in a new row ({newRow.Length}) does not match the number of columns ({titles.Length})");
+            
+            elements[row] = newRow.Select(x => x.ToString()).ToList();
+        }
+
+
+        public int GetIndexOfTitle(string title)
+        {
+            if (Array.IndexOf(titles, title) == -1)
+                throw new Exception($"Column \"{title}\" does not exist");
+
+            return Array.IndexOf(titles, title);
+        }
+
+        public string GetElementAt(int row, int column)
+        {
+            if (row > elements.Count || row < 0)
+                throw new Exception($"Row {row} does not exist");
+
+            if (column > elements[row].Count || column < 0)
+                throw new Exception($"Column {column} does not exist");
+
+            return elements[row][column];
+        }
+
+        public string GetElementWithRowAndTitle(int row, string title)
+        {
+            if (row > elements.Count || row < 0)
+                throw new Exception($"Row {row} does not exist");
+
+            return elements[row][GetIndexOfTitle(title)];
+        }
+
+        
+        
+        public void ChangeElementAt(int row, int column, string newElement)
+        {
+            if (row > elements.Count || row < 0)
+                throw new Exception($"Row {row} does not exist");
+            
+            if (column > elements[row].Count || column < 0)
+                throw new Exception($"Column {column} does not exist");
+            
+            elements[row][column] = newElement;
+        }
+
+        public void ChangeElementWithRowAndTitle(int row, string title, string newElement)
+        {
+            if (row > elements.Count || row < 0)
+                throw new Exception($"Row {row} does not exist");
+
+            elements[row][GetIndexOfTitle(title)] = newElement;
+        }
+        
+
+        
         public void SetSpacesOfColumn(int space)
         {
             if (space < 0)
                 throw new Exception("The space of column must be positive");
 
             spaceOfColumn = space;
-        }
-
-        public void Show()
-        {
-            Console.WriteLine(GetTableAsString());
-        }
-        
-        public void ShowWithNumeration()
-        {
-            Console.WriteLine(GetTableAsString(true));
         }
 
         public string GetTableAsString(bool doWeDrawNumbers = false)
@@ -187,6 +250,16 @@ namespace TableOfInfo
 
             }
             return resultString;
+        }
+
+        public void Show()
+        {
+            Console.WriteLine(GetTableAsString());
+        }
+        
+        public void ShowWithNumeration()
+        {
+            Console.WriteLine(GetTableAsString(true));
         }
         
         #endregion
