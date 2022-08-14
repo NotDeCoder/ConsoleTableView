@@ -23,7 +23,7 @@ namespace TableOfInfo
 
         #region Variables
         private string[] titles; //They will be at the top of table
-        private List<List<string>> elements; //Map of elements. I use List of List becouse it`s faster than Dictionary
+        private List<List<object>> elements; //Map of elements. I use List of List becouse it`s faster than Dictionary
         private int spaceOfColumn;
         //Spaces of every column. Example:
         //If spaceOfColumn == 0 we will have:       If spaceOfColumn == 2 we will have:
@@ -36,7 +36,7 @@ namespace TableOfInfo
         #endregion
 
         #region Private Methods
-        private int GetLargestWidthsFromColumn(string[] newTitles, List<List<string>> newElements, int column)
+        private int GetLargestWidthsFromColumn(string[] newTitles, List<List<object>> newElements, int column)
         {
             int maxLength = newTitles[column].Length;
             for (int i = 0; i < newElements.Count; i++)
@@ -55,7 +55,7 @@ namespace TableOfInfo
                 throw new Exception("There must be at least one title. Add they in constructor");
 
             titles = constrTitles;
-            elements = new List<List<string>>();
+            elements = new List<List<object>>();
             spaceOfColumn = 2;
         }
 
@@ -64,7 +64,7 @@ namespace TableOfInfo
             if (newRow.Length != titles.Length)
                 throw new Exception($"The number of elements in a new row ({newRow.Length}) does not match the number of columns ({titles.Length})");
 
-            elements.Add(newRow.Select(x => x.ToString()).ToList());
+            elements.Add(newRow.ToList());
         }
 
         public void InsertRow(int index, params object[] newRow)
@@ -75,7 +75,7 @@ namespace TableOfInfo
             if (index < 0 || index > elements.Count)
                 throw new Exception($"Index ({index}) is out of range");
 
-            elements.Insert(index, newRow.Select(x => x.ToString()).ToList());
+            elements.Insert(index, newRow.ToList());
         }
         
         public void DeleteRow(int row)
@@ -94,7 +94,7 @@ namespace TableOfInfo
             if (newRow.Length != titles.Length)
                 throw new Exception($"The number of elements in a new row ({newRow.Length}) does not match the number of columns ({titles.Length})");
             
-            elements[row] = newRow.Select(x => x.ToString()).ToList();
+            elements[row] = newRow.ToList();
         }
 
 
@@ -106,7 +106,7 @@ namespace TableOfInfo
             return Array.IndexOf(titles, title);
         }
 
-        public string GetElementAt(int row, int column)
+        public object GetElementAt(int row, int column)
         {
             if (row > elements.Count || row < 0)
                 throw new Exception($"Row {row} does not exist");
@@ -117,7 +117,7 @@ namespace TableOfInfo
             return elements[row][column];
         }
 
-        public string GetElementWithRowAndTitle(int row, string title)
+        public object GetElementWithRowAndTitle(int row, string title)
         {
             if (row > elements.Count || row < 0)
                 throw new Exception($"Row {row} does not exist");
@@ -127,7 +127,7 @@ namespace TableOfInfo
 
         
         
-        public void ChangeElementAt(int row, int column, string newElement)
+        public void ChangeElementAt(int row, int column, object newElement)
         {
             if (row > elements.Count || row < 0)
                 throw new Exception($"Row {row} does not exist");
@@ -138,7 +138,7 @@ namespace TableOfInfo
             elements[row][column] = newElement;
         }
 
-        public void ChangeElementWithRowAndTitle(int row, string title, string newElement)
+        public void ChangeElementWithRowAndTitle(int row, string title, object newElement)
         {
             if (row > elements.Count || row < 0)
                 throw new Exception($"Row {row} does not exist");
@@ -161,7 +161,7 @@ namespace TableOfInfo
             string resultString = "";
 
             string[] newTitles;
-            List<List<string>> newElements;
+            List<List<object>> newElements;
             if (doWeDrawNumbers) //Add new title, add number to every element
             {
                 newTitles = titles.Prepend("Number").ToArray();
@@ -170,7 +170,7 @@ namespace TableOfInfo
             else
             {
                 newTitles = titles;
-                newElements = elements;
+                newElements =  elements;
             }
 
             //Array with largest widths from each column
@@ -217,8 +217,8 @@ namespace TableOfInfo
             {
                 for (int j = 0; j < newElements[i].Count; j++)
                 {
-                    string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[j] - newElements[i][j].Length) / 2);
-                    string rightPadding = new string(PADDING, columnsWidth[j] - newElements[i][j].Length - ((columnsWidth[j] - newElements[i][j].Length) / 2));
+                    string leftPadding = VERTICAL_LINE + new string(PADDING, (columnsWidth[j] - newElements[i][j].ToString().Length) / 2);
+                    string rightPadding = new string(PADDING, columnsWidth[j] - newElements[i][j].ToString().Length - ((columnsWidth[j] - newElements[i][j].ToString().Length) / 2));
                     if (j == newElements[i].Count - 1) //If it`s last cell
                         rightPadding = rightPadding + VERTICAL_LINE + '\n';
                     resultString += leftPadding + newElements[i][j] + rightPadding; // "│  NotLastElement  ",    "│  LastElement  │"
@@ -261,7 +261,7 @@ namespace TableOfInfo
         {
             Console.WriteLine(GetTableAsString(true));
         }
-        
+
         #endregion
     }
 }
